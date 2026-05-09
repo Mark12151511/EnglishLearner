@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AppInstaller
+  Uri="https://your-update-server.com/EnglishLearner/EnglishLearner.appinstaller"
+  Version="1.0.0.0"
+  xmlns="http://schemas.microsoft.com/appx/appinstaller/2018">
+
+  <MainBundle
+    Name="EnglishLearner"
+    Version="1.0.0.0"
+    Uri="https://your-update-server.com/EnglishLearner/EnglishLearner_1.0.0.0.msixbundle"
+    Publisher="CN=EnglishLearner" />
+
+  <UpdateSettings>
+    <OnLaunch HoursBetweenUpdateChecks="12" />
+    <AutomaticBackgroundTask />
+    <ForceUpdateFromAnyVersion>false</ForceUpdateFromAnyVersion>
+  </UpdateSettings>
+</AppInstaller>

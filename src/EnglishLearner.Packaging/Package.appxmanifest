@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:uap5="http://schemas.microsoft.com/appx/manifest/uap/windows10/5"
+  xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
+  xmlns:desktop4="http://schemas.microsoft.com/appx/manifest/desktop/windows10/4"
+  xmlns:iot2="http://schemas.microsoft.com/appx/manifest/iot/windows10/2"
+  IgnorableNamespaces="uap uap5 com desktop4 iot2">
+
+  <Identity
+    Name="EnglishLearner"
+    Publisher="CN=EnglishLearner"
+    Version="1.0.0.0" />
+
+  <mp:PhoneIdentity PhoneProductId="A1B2C3D4-0001-0001-0001-000000000001" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+
+  <Properties>
+    <DisplayName>EnglishLearner</DisplayName>
+    <PublisherDisplayName>EnglishLearner</PublisherDisplayName>
+    <Logo>Images\StoreLogo.png</Logo>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.17763.0" MaxVersionTested="10.0.19041.0" />
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.19041.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="x-generate"/>
+  </Resources>
+
+  <Applications>
+    <Application Id="EnglishLearner"
+                 Executable="EnglishLearner.App\EnglishLearner.App.exe"
+                 EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements
+        DisplayName="EnglishLearner"
+        Description="英语单词学习工具"
+        BackgroundColor="transparent"
+        Square150x150Logo="Images\Square150x150Logo.png"
+        Square44x44Logo="Images\Square44x44Logo.png">
+        <uap:DefaultTile Wide310x150Logo="Images\Wide310x150Logo.png" />
+        <uap:SplashScreen Image="Images\SplashScreen.png" />
+      </uap:VisualElements>
+
+      <Extensions>
+        <!-- Toast 通知支持 -->
+        <desktop4:Extension Category="windows.toastNotificationActivation">
+          <desktop4:ToastNotificationActivation
+            ToastActivatorCLSID="B1C2D3E4-0005-0005-0005-000000000005" />
+        </desktop4:Extension>
+
+        <!-- 开机自启 -->
+        <desktop4:Extension Category="windows.startupTask">
+          <desktop4:StartupTask
+            TaskId="EnglishLearnerStartup"
+            Enabled="true"
+            DisplayName="EnglishLearner 复习提醒" />
+        </desktop4:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <Capability Name="internetClient" />
+    <rescap:Capability Name="runFullTrust" xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities" />
+  </Capabilities>
+</Package>
