@@ -1,3 +1,4 @@
+using System.IO;
 using System.Windows;
 using EnglishLearner.App.Services;
 using EnglishLearner.App.ViewModels;
@@ -40,6 +41,16 @@ public partial class App : Application
 
         await EnsureDatabaseAsync(_serviceProvider);
 
+        // ★ 词库导入（仅首次运行执行，之后自动跳过）
+        using (var seedScope = _serviceProvider.CreateScope())
+        {
+            var db = seedScope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var seeder = new WordSeeder(db);
+            var csvPath = Path.Combine(AppContext.BaseDirectory,
+                                       "Assets", "WordLists", "words_enriched.csv");
+            await seeder.SeedAsync(csvPath);
+        }
+
         // Toast 点击事件
         ToastNotificationManagerCompat.OnActivated += OnToastActivated;
 
@@ -50,6 +61,9 @@ public partial class App : Application
         // 每日提醒调度
         _scheduler = _serviceProvider.GetRequiredService<DailyReviewScheduler>();
         _scheduler.Start();
+
+        // 后台初始化 TTS 引擎（模型较大，不阻塞 UI）
+        _ = _serviceProvider.GetRequiredService<ISpeechService>().InitializeAsync();
 
         // 显示主窗口
         ShowMainWindow();
@@ -71,6 +85,9 @@ public partial class App : Application
         services.AddSingleton(typeof(IRepository<>), typeof(Repository<>));
         services.AddSingleton<ISm2Service, Sm2Service>();
         services.AddSingleton<IAiService, ClaudeAiService>();
+        services.AddSingleton<ILearningService, LearningService>();
+        services.AddSingleton<IQuizService, QuizService>();
+        services.AddSingleton<ISpeechService, SystemSpeechService>();
 
         services.AddSingleton<ToastNotificationService>();
         services.AddSingleton<DailyReviewScheduler>();
@@ -110,6 +127,7 @@ public partial class App : Application
 
     private void ExitApp()
     {
+        _serviceProvider.GetRequiredService<ISpeechService>().Dispose();
         _scheduler.Dispose();
         _trayIcon.Dispose();
         Shutdown();

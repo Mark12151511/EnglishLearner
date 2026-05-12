@@ -7,7 +7,12 @@
       "Read(//c/Program Files/Microsoft Visual Studio/**)",
       "Bash(C:/Users/Administrator/Downloads/dotnet-sdk-8.0.420-win-x64.exe *)",
       "Bash(taskkill /IM EnglishLearner.App.exe /F)",
-      "Bash(start \"\" \"F:/vs/EnglishLearner/src/EnglishLearner.App/bin/Debug/net8.0-windows10.0.19041.0/EnglishLearner.App.exe\")"
+      "Bash(start \"\" \"F:/vs/EnglishLearner/src/EnglishLearner.App/bin/Debug/net8.0-windows10.0.19041.0/EnglishLearner.App.exe\")",
+      "Bash(dir /s /b \"%USERPROFILE%\\\\.nuget\\\\packages\\\\kokorosharp\\\\0.6.7\\\\lib\")",
+      "Bash(dir /s /b \"%USERPROFILE%\\\\.nuget\\\\packages\\\\kokorosharp\\\\0.6.7\")",
+      "Read(//c/Users/Administrator/.nuget/packages/kokorosharp/0.6.7/temp/lib/net8.0/**)",
+      "Bash(ildasm /output=KokoroSharp.il KokoroSharp.dll)",
+      "Bash(Remove-Item *)"
     ]
   }
 }

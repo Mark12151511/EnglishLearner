@@ -1,0 +1,212 @@
+<UserControl x:Class="EnglishLearner.App.Views.QuizView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:EnglishLearner.App.ViewModels">
+    <UserControl.DataContext>
+        <vm:QuizViewModel/>
+    </UserControl.DataContext>
+
+    <Grid Background="#F0F0F0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Row 0: 难度筛选 + 进度区 -->
+        <Border Grid.Row="0" Background="White" Padding="20,14"
+                BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
+            <StackPanel>
+                <ComboBox x:Name="DifficultyCombo" SelectedIndex="0"
+                          HorizontalAlignment="Left" Margin="0,0,0,8"
+                          Padding="8,6" FontSize="14"
+                          SelectionChanged="DifficultyFilter_Changed">
+                    <ComboBoxItem Content="雅思基础 B1+B2" Tag="2,3"/>
+                    <ComboBoxItem Content="雅思进阶 C1"     Tag="4"/>
+                    <ComboBoxItem Content="托福核心 B2+C1"  Tag="3,4"/>
+                    <ComboBoxItem Content="全部词库"         Tag="1,2,3,4,5"/>
+                </ComboBox>
+                <Grid>
+                    <TextBlock Text="{Binding Progress}" FontSize="16" FontWeight="SemiBold"
+                               Foreground="#555" HorizontalAlignment="Center"/>
+                </Grid>
+                <ProgressBar Value="{Binding CurrentIndex}" Maximum="{Binding TotalCount}"
+                             Height="6" Margin="0,8,0,0"
+                             Foreground="#4CAF50" Background="#E0E0E0"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Row 1: 答题区 -->
+        <Grid Grid.Row="1" Margin="20,16,20,8">
+            <!-- 题目卡片 -->
+            <Border x:Name="QuestionCard" Background="White" CornerRadius="12" Padding="24"
+                    Visibility="{Binding IsQuizFinished, Converter={StaticResource InvertBool}}"
+                    RenderTransformOrigin="0.5,0.5">
+                <Border.RenderTransform>
+                    <TransformGroup>
+                        <TranslateTransform x:Name="ShakeTransform" X="0"/>
+                    </TransformGroup>
+                </Border.RenderTransform>
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="8" ShadowDepth="2" Opacity="0.12"/>
+                </Border.Effect>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <!-- 题目 + 发音按钮 -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <TextBlock Text="{Binding CurrentQuestion.Question}" FontSize="24"
+                                       FontWeight="Bold" Foreground="#333" TextWrapping="Wrap"
+                                       TextAlignment="Center" VerticalAlignment="Center"/>
+                            <Button Command="{Binding SpeakCommand}" Cursor="Hand"
+                                    VerticalAlignment="Center" Margin="10,0,0,2" ToolTip="点击发音">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Grid>
+                                            <Ellipse x:Name="circle" Width="32" Height="32" Fill="#E3F2FD"/>
+                                            <TextBlock Text="&#x1F50A;" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="circle" Property="Fill" Value="#BBDEFB"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </StackPanel>
+
+                        <!-- 选项 -->
+                        <ItemsControl Margin="0,24,0,0" x:Name="OptionsPanel">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Margin="0,4" Height="44" Cursor="Hand"
+                                            Command="{Binding DataContext.SelectOptionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding Index}">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="bd" CornerRadius="8" Padding="16,10"
+                                                        BorderThickness="2"
+                                                        Background="{Binding BgColor}"
+                                                        BorderBrush="{Binding BorderColor}">
+                                                    <TextBlock Text="{Binding Label}"
+                                                               Foreground="#333" FontSize="15"
+                                                               TextWrapping="Wrap"
+                                                               VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="bd" Property="Opacity" Value="0.85"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- 答题反馈 -->
+                        <StackPanel Margin="0,20,0,0" HorizontalAlignment="Center"
+                                    Visibility="{Binding IsAnswered, Converter={StaticResource BoolVis}}">
+                            <TextBlock FontSize="28" FontWeight="Bold" HorizontalAlignment="Center"
+                                       Margin="0,0,0,8">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="&#x2714; 答对了！"/>
+                                        <Setter Property="Foreground" Value="#4CAF50"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsCorrect}" Value="False">
+                                                <Setter Property="Text" Value="&#x2718; 答错了"/>
+                                                <Setter Property="Foreground" Value="#F44336"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <TextBlock Text="{Binding CurrentQuestion.Explanation}" FontSize="14"
+                                       Foreground="#777" TextWrapping="Wrap" TextAlignment="Center"
+                                       FontStyle="Italic" MaxWidth="380"/>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!-- 完成页 -->
+            <Border Background="White" CornerRadius="12" Padding="24"
+                    Visibility="{Binding IsQuizFinished, Converter={StaticResource BoolVis}}">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="8" ShadowDepth="2" Opacity="0.12"/>
+                </Border.Effect>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock Text="测验完成！" FontSize="28" FontWeight="Bold"
+                                   Foreground="#333" HorizontalAlignment="Center"/>
+                        <TextBlock x:Name="AccuracyText" FontSize="48" FontWeight="Bold"
+                                   HorizontalAlignment="Center" Foreground="#4CAF50" Margin="0,16,0,0"
+                                   Text="{Binding Result.Accuracy, StringFormat={}{0:P0}, Mode=OneWay}"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,12,0,0">
+                            <TextBlock FontSize="15" Foreground="#666">
+                                <Run Text="正确 "/><Run x:Name="CorrectCountRun" Foreground="#4CAF50" FontWeight="Bold"/>
+                            </TextBlock>
+                            <TextBlock FontSize="15" Foreground="#666" Margin="20,0,0,0">
+                                <Run Text="错误 "/><Run x:Name="WrongCountRun" Foreground="#F44336" FontWeight="Bold"/>
+                            </TextBlock>
+                        </StackPanel>
+
+                        <!-- 错题列表 -->
+                        <ItemsControl Margin="0,20,0,0"
+                                      ItemsSource="{Binding Result.WrongQuestions}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="#FFF3F3" CornerRadius="8" Padding="12,8"
+                                            Margin="0,4" BorderBrush="#FFCDD2" BorderThickness="1">
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Question}" FontSize="14"
+                                                       FontWeight="SemiBold" Foreground="#C62828"/>
+                                            <TextBlock x:Name="CorrectAnswerText" FontSize="13"
+                                                       Foreground="#777" Margin="0,4,0,0"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Button Content="再来一次" Margin="0,20,0,0" Padding="32,12"
+                                FontSize="16" FontWeight="SemiBold" Cursor="Hand"
+                                Command="{Binding RestartQuizCommand}"
+                                Background="#2196F3" Foreground="White"
+                                Style="{StaticResource RatingButton}"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- Row 2: 操作区 -->
+        <Grid Grid.Row="2" Margin="16,0,16,20"
+              Visibility="{Binding IsQuizFinished, Converter={StaticResource InvertBool}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Content="提交答案" Padding="20,10"
+                    FontSize="16" FontWeight="SemiBold" Cursor="Hand" Margin="0,0,4,0"
+                    Command="{Binding SubmitAnswerCommand}"
+                    Background="#2196F3" Style="{StaticResource RatingButton}"/>
+            <Button Grid.Column="1" Content="下一题" Padding="20,10"
+                    FontSize="16" FontWeight="SemiBold" Cursor="Hand" Margin="4,0,0,0"
+                    Command="{Binding NextQuestionCommand}"
+                    Background="#FF9800" Style="{StaticResource RatingButton}">
+                <Button.Resources>
+                    <Style TargetType="Button" BasedOn="{StaticResource RatingButton}">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsAnswered}" Value="True">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Resources>
+            </Button>
+        </Grid>
+    </Grid>
+</UserControl>

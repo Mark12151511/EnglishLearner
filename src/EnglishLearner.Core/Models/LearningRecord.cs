@@ -19,4 +19,6 @@ public enum LearningActivityType
     Spelling,
     Listening,
     Reading,
+    WordLearning,
+    Quiz,
 }

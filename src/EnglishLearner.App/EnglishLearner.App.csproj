@@ -32,4 +32,10 @@
     <ProjectReference Include="..\EnglishLearner.Infrastructure\EnglishLearner.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Assets\WordLists\words_enriched.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

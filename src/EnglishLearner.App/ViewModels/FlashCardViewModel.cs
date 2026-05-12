@@ -1,5 +1,3 @@
-using System.Globalization;
-using System.Speech.Synthesis;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -13,11 +11,10 @@ namespace EnglishLearner.App.ViewModels;
 public partial class FlashCardViewModel : ObservableObject
 {
     private readonly ISm2Service _sm2Service;
+    private readonly ISpeechService _speechService;
     private readonly List<Word> _dueWords = [];
-    private readonly SpeechSynthesizer _synth = new();
 
-    // 评分后通知 View 执行动作
-    public event Action<bool>? RateCompleted; // true = 翻回正面(Again), false = 切新词
+    public event Action<bool>? RateCompleted;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasWord))]
@@ -38,18 +35,11 @@ public partial class FlashCardViewModel : ObservableObject
 
     public FlashCardViewModel()
     {
-        _sm2Service = ((App)Application.Current).ServiceProvider.GetRequiredService<ISm2Service>();
-        InitSpeech();
-        InitializeAsync();
-    }
+        var sp = ((App)Application.Current).ServiceProvider;
+        _sm2Service = sp.GetRequiredService<ISm2Service>();
+        _speechService = sp.GetRequiredService<ISpeechService>();
 
-    private void InitSpeech()
-    {
-        var voice = _synth.GetInstalledVoices(new CultureInfo("en-US"))
-            .FirstOrDefault(v => v.Enabled);
-        if (voice != null)
-            _synth.SelectVoice(voice.VoiceInfo.Name);
-        _synth.Rate = -1;
+        InitializeAsync();
     }
 
     private async void InitializeAsync()
@@ -65,7 +55,11 @@ public partial class FlashCardViewModel : ObservableObject
                 var repo = ((App)Application.Current).ServiceProvider
                     .GetRequiredService<IRepository<Word>>();
                 var all = await repo.GetAllAsync();
-                _dueWords.AddRange(all.Take(20));
+                var filtered = all
+                    .Where(w => w.DifficultyLevel >= 2 && w.DifficultyLevel <= 3)
+                    .OrderBy(_ => Random.Shared.Next())
+                    .Take(50);
+                _dueWords.AddRange(filtered);
             }
 
             RemainingCount = _dueWords.Count;
@@ -86,8 +80,8 @@ public partial class FlashCardViewModel : ObservableObject
     private void Speak()
     {
         if (CurrentWord is null) return;
-        _synth.SpeakAsyncCancelAll();
-        _synth.SpeakAsync(CurrentWord.Text);
+        _speechService.Stop();
+        _speechService.Speak(CurrentWord.Text);
     }
 
     [RelayCommand]
@@ -107,14 +101,12 @@ public partial class FlashCardViewModel : ObservableObject
 
         ReviewedToday++;
 
-        // Again(quality=0): 翻回正面，同一个词重新看
         if (quality == 0)
         {
             RateCompleted?.Invoke(true);
             return;
         }
 
-        // Hard/Good/Easy: 记录并切下一个词
         RemainingCount = Math.Max(0, RemainingCount - 1);
         MoveToNext();
         RateCompleted?.Invoke(false);
@@ -126,6 +118,8 @@ public partial class FlashCardViewModel : ObservableObject
         {
             CurrentWord = _dueWords[0];
             _dueWords.RemoveAt(0);
+            if (CurrentWord is not null)
+                _speechService.Preload(CurrentWord.Text);
         }
         else
         {

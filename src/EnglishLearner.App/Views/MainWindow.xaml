@@ -6,5 +6,31 @@
         ResizeMode="CanMinimize"
         StateChanged="Window_StateChanged"
         Loaded="Window_Loaded">
-    <Grid x:Name="RootGrid"/>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- 导航栏 -->
+        <Border Grid.Row="0" Background="White" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
+            <StackPanel Orientation="Horizontal" Margin="12,8">
+                <Button x:Name="NavLearning" Content="学单词" Click="NavLearning_Click"
+                        Padding="16,8" Margin="0,0,4,0" FontSize="14" FontWeight="SemiBold"
+                        Cursor="Hand" Background="#2196F3" Foreground="White"
+                        Style="{StaticResource NavButton}"/>
+                <Button x:Name="NavQuiz" Content="测验" Click="NavQuiz_Click"
+                        Padding="16,8" Margin="4,0,4,0" FontSize="14" FontWeight="SemiBold"
+                        Cursor="Hand" Background="#E0E0E0" Foreground="#666"
+                        Style="{StaticResource NavButton}"/>
+                <Button x:Name="NavMastered" Content="已完成" Click="NavMastered_Click"
+                        Padding="16,8" Margin="4,0,0,0" FontSize="14" FontWeight="SemiBold"
+                        Cursor="Hand" Background="#E0E0E0" Foreground="#666"
+                        Style="{StaticResource NavButton}"/>
+            </StackPanel>
+        </Border>
+
+        <!-- 内容区 -->
+        <Grid Grid.Row="1" x:Name="ContentArea"/>
+    </Grid>
 </Window>

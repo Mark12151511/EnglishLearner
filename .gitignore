@@ -45,3 +45,7 @@ AppPackages/
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+## Large assets (TTS models, raw data)
+src/EnglishLearner.App/Assets/Kokoro/
+data/
