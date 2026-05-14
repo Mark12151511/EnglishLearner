@@ -47,7 +47,7 @@ public partial class QuizViewModel : ObservableObject
     [ObservableProperty]
     private QuizResult? _result;
 
-    public int[] DifficultyFilter { get; set; } = [2, 3];
+    private int[] _difficultyFilter = [2, 3];
 
     public string Progress => $"{CurrentIndex + 1} / {TotalCount}";
     public bool CanSubmit => SelectedOptionIndex.HasValue && !IsAnswered;
@@ -65,6 +65,7 @@ public partial class QuizViewModel : ObservableObject
     {
         try
         {
+            _difficultyFilter = await _learningService.GetDifficultyFilterAsync();
             _userAnswers.Clear();
             IsQuizFinished = false;
             Result = null;
@@ -73,7 +74,7 @@ public partial class QuizViewModel : ObservableObject
             SelectedOptionIndex = null;
             CurrentIndex = 0;
 
-            _quiz = await _quizService.GenerateQuizAsync(count: 10, difficultyFilter: DifficultyFilter);
+            _quiz = await _quizService.GenerateQuizAsync(count: 10, difficultyFilter: _difficultyFilter);
             TotalCount = _quiz.Questions.Count;
             CurrentQuestion = _quiz.Questions[0];
 

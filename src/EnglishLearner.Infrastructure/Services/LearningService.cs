@@ -14,21 +14,23 @@ public class LearningService : ILearningService
         _db = db;
     }
 
-    public async Task<int> GetCurrentGroupIndexAsync()
+    public async Task<int> GetCurrentGroupIndexAsync(int[]? difficultyFilter = null)
     {
+        var key = GetGroupIndexKey(difficultyFilter);
         var setting = await _db.Set<UserSetting>()
-            .FirstOrDefaultAsync(s => s.Key == "CurrentLearningGroup");
+            .FirstOrDefaultAsync(s => s.Key == key);
         return setting is not null && int.TryParse(setting.Value, out var idx) ? idx : 0;
     }
 
-    public async Task SetCurrentGroupIndexAsync(int index)
+    public async Task SetCurrentGroupIndexAsync(int index, int[]? difficultyFilter = null)
     {
+        var key = GetGroupIndexKey(difficultyFilter);
         var setting = await _db.Set<UserSetting>()
-            .FirstOrDefaultAsync(s => s.Key == "CurrentLearningGroup");
+            .FirstOrDefaultAsync(s => s.Key == key);
 
         if (setting is null)
         {
-            _db.Add(new UserSetting { Key = "CurrentLearningGroup", Value = index.ToString() });
+            _db.Add(new UserSetting { Key = key, Value = index.ToString() });
         }
         else
         {
@@ -39,14 +41,20 @@ public class LearningService : ILearningService
         await _db.SaveChangesAsync();
     }
 
-    public async Task<int> GetTotalWordCountAsync()
+    public async Task<int> GetTotalWordCountAsync(int[]? difficultyFilter = null)
     {
+        if (difficultyFilter is not null && difficultyFilter.Length > 0)
+            return await _db.Words.CountAsync(w => difficultyFilter.Contains(w.DifficultyLevel));
         return await _db.Words.CountAsync();
     }
 
-    public async Task<IReadOnlyList<Word>> GetWordGroupAsync(int groupIndex, int groupSize = 10)
+    public async Task<IReadOnlyList<Word>> GetWordGroupAsync(int groupIndex, int[]? difficultyFilter = null, int groupSize = 10)
     {
-        return await _db.Words
+        var query = _db.Words.AsQueryable();
+        if (difficultyFilter is not null && difficultyFilter.Length > 0)
+            query = query.Where(w => difficultyFilter.Contains(w.DifficultyLevel));
+
+        return await query
             .OrderBy(w => w.Id)
             .Skip(groupIndex * groupSize)
             .Take(groupSize)
@@ -66,8 +74,9 @@ public class LearningService : ILearningService
             });
         }
 
-        var currentIdx = await GetCurrentGroupIndexAsync();
-        await SetCurrentGroupIndexAsync(currentIdx + 1);
+        var filter = await GetDifficultyFilterAsync();
+        var currentIdx = await GetCurrentGroupIndexAsync(filter);
+        await SetCurrentGroupIndexAsync(currentIdx + 1, filter);
     }
 
     public async Task<IReadOnlyList<Word>> GetLearnedWordsAsync(int[]? difficultyFilter = null)
@@ -88,15 +97,22 @@ public class LearningService : ILearningService
         return await query.ToListAsync();
     }
 
-    public async Task<IReadOnlyList<Word>> GetMasteredWordsAsync()
+    public async Task<IReadOnlyList<Word>> GetMasteredWordsAsync(int[]? difficultyFilter = null)
     {
         var masteredIds = await GetMasteredWordIdsAsync();
-        return await _db.Words.Where(w => masteredIds.Contains(w.Id)).ToListAsync();
+        var query = _db.Words.Where(w => masteredIds.Contains(w.Id));
+        if (difficultyFilter is not null && difficultyFilter.Length > 0)
+            query = query.Where(w => difficultyFilter.Contains(w.DifficultyLevel));
+        return await query.ToListAsync();
     }
 
-    public async Task<IReadOnlyList<WordProgress>> GetAllWordProgressAsync()
+    public async Task<IReadOnlyList<WordProgress>> GetAllWordProgressAsync(int[]? difficultyFilter = null)
     {
-        var words = await _db.Words.OrderBy(w => w.Id).ToListAsync();
+        var query = _db.Words.AsQueryable();
+        if (difficultyFilter is not null && difficultyFilter.Length > 0)
+            query = query.Where(w => difficultyFilter.Contains(w.DifficultyLevel));
+
+        var words = await query.OrderBy(w => w.Id).ToListAsync();
         var records = await _db.Set<LearningRecord>().ToListAsync();
 
         var learnedSet = records
@@ -132,6 +148,48 @@ public class LearningService : ILearningService
             PracticedAt = DateTime.UtcNow
         });
         await _db.SaveChangesAsync();
+    }
+
+    public async Task<int[]> GetDifficultyFilterAsync()
+    {
+        var setting = await _db.Set<UserSetting>()
+            .FirstOrDefaultAsync(s => s.Key == "DifficultyFilter");
+        if (setting is not null)
+        {
+            try
+            {
+                return setting.Value.Split(',').Select(int.Parse).ToArray();
+            }
+            catch { }
+        }
+        return [2, 3]; // default: B1+B2 (雅思基础)
+    }
+
+    public async Task SetDifficultyFilterAsync(int[] filter)
+    {
+        var setting = await _db.Set<UserSetting>()
+            .FirstOrDefaultAsync(s => s.Key == "DifficultyFilter");
+
+        var value = string.Join(",", filter);
+
+        if (setting is null)
+        {
+            _db.Add(new UserSetting { Key = "DifficultyFilter", Value = value });
+        }
+        else
+        {
+            setting.Value = value;
+            setting.UpdatedAt = DateTime.UtcNow;
+        }
+
+        await _db.SaveChangesAsync();
+    }
+
+    private static string GetGroupIndexKey(int[]? difficultyFilter)
+    {
+        if (difficultyFilter is null || difficultyFilter.Length == 0)
+            return "CurrentLearningGroup";
+        return $"CurrentLearningGroup_{string.Join("_", difficultyFilter.OrderBy(x => x))}";
     }
 
     private async Task<List<int>> GetMasteredWordIdsAsync()

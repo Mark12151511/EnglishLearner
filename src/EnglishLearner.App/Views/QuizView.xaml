@@ -13,19 +13,10 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Row 0: 难度筛选 + 进度区 -->
+        <!-- Row 0: 进度区 -->
         <Border Grid.Row="0" Background="White" Padding="20,14"
                 BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
             <StackPanel>
-                <ComboBox x:Name="DifficultyCombo" SelectedIndex="0"
-                          HorizontalAlignment="Left" Margin="0,0,0,8"
-                          Padding="8,6" FontSize="14"
-                          SelectionChanged="DifficultyFilter_Changed">
-                    <ComboBoxItem Content="雅思基础 B1+B2" Tag="2,3"/>
-                    <ComboBoxItem Content="雅思进阶 C1"     Tag="4"/>
-                    <ComboBoxItem Content="托福核心 B2+C1"  Tag="3,4"/>
-                    <ComboBoxItem Content="全部词库"         Tag="1,2,3,4,5"/>
-                </ComboBox>
                 <Grid>
                     <TextBlock Text="{Binding Progress}" FontSize="16" FontWeight="SemiBold"
                                Foreground="#555" HorizontalAlignment="Center"/>

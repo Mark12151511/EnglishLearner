@@ -13,19 +13,22 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Row 0: 顶部统计 -->
+        <!-- Row 0: 顶部统计 + 难度筛选 -->
         <Border Grid.Row="0" Background="White" Padding="20,14"
                 BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
             <Grid>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                     <TextBlock Text="{Binding GroupProgressText}" FontSize="14"
                                Foreground="#666" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding LearnedDisplayText}" FontSize="14"
+                               Foreground="#666" Margin="20,0,0,0" VerticalAlignment="Center"/>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <TextBlock Text="已学" FontSize="14" Foreground="#666" VerticalAlignment="Center"/>
-                    <TextBlock Text="{Binding LearnedCount}" FontSize="22" FontWeight="Bold"
-                               Foreground="#4CAF50" Margin="8,0,0,0" VerticalAlignment="Center"/>
-                </StackPanel>
+                <ComboBox x:Name="DifficultyCombo"
+                          SelectedIndex="{Binding SelectedDifficultyIndex, Mode=TwoWay}"
+                          HorizontalAlignment="Right"
+                          Padding="8,6" FontSize="13"
+                          ItemsSource="{Binding DifficultyList}"
+                          DisplayMemberPath="Label"/>
             </Grid>
         </Border>
 

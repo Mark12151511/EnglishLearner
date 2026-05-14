@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -127,14 +126,6 @@ public partial class QuizView : UserControl
             ShakeTransform.BeginAnimation(TranslateTransform.XProperty, shake);
         }
         catch { }
-    }
-
-    private void DifficultyFilter_Changed(object sender, SelectionChangedEventArgs e)
-    {
-        if (_vm is null || DifficultyCombo.SelectedItem is not ComboBoxItem item || item.Tag is not string tag) return;
-
-        _vm.DifficultyFilter = tag.Split(',').Select(int.Parse).ToArray();
-        _vm.RestartQuizCommand.Execute(null);
     }
 
     private void RefreshOptions()

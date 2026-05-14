@@ -15,11 +15,19 @@ public class WordSeeder
 
     public async Task SeedAsync(string csvPath)
     {
-        // 已有数据就跳过，避免重复导入
-        if (await _db.Words.AnyAsync())
+        var existingCount = await _db.Words.CountAsync();
+        if (existingCount > 100)
         {
-            Log.Information("WordSeeder: 词库已存在，跳过导入");
+            Log.Information("WordSeeder: 词库已存在 ({Count} 词)，跳过导入", existingCount);
             return;
+        }
+
+        // Migration 插入的种子数据只有 100 条，用 CSV 完整数据替换
+        if (existingCount > 0)
+        {
+            _db.Words.RemoveRange(_db.Words);
+            await _db.SaveChangesAsync();
+            Log.Information("WordSeeder: 清除旧种子数据 ({Count} 条)", existingCount);
         }
 
         if (!File.Exists(csvPath))

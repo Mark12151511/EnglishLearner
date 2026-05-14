@@ -61,7 +61,8 @@ public partial class MasteredWordsViewModel : ObservableObject
 
     private async Task RefreshDataAsync()
     {
-        var progress = await _learningService.GetAllWordProgressAsync();
+        var filter = await _learningService.GetDifficultyFilterAsync();
+        var progress = await _learningService.GetAllWordProgressAsync(filter);
         AllProgress = progress;
         TotalCount = progress.Count;
         LearnedCount = progress.Count(p => p.IsLearned);

@@ -20,8 +20,6 @@ public class AppDbContext : DbContext
         ConfigureLearningRecord(modelBuilder);
         ConfigureUserSetting(modelBuilder);
         ConfigureSm2Profile(modelBuilder);
-
-        modelBuilder.Entity<Word>().HasData(SeedData.GetWords());
     }
 
     private static void ConfigureWord(ModelBuilder modelBuilder)
