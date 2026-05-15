@@ -6,7 +6,9 @@
     <Application.Resources>
         <!-- Converters -->
         <conv:BoolToVisibilityConverter x:Key="BoolVis"/>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
         <conv:InvertBoolToVisibilityConverter x:Key="InvertBool"/>
+        <conv:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility"/>
 
         <!-- Rating Button Style -->
         <Style x:Key="RatingButton" TargetType="Button">

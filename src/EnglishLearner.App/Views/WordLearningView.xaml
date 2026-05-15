@@ -14,43 +14,43 @@
         </Grid.RowDefinitions>
 
         <!-- Row 0: 顶部统计 + 难度筛选 -->
-        <Border Grid.Row="0" Background="White" Padding="20,14"
+        <Border Grid.Row="0" Background="White" Padding="24,16"
                 BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
             <Grid>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                    <TextBlock Text="{Binding GroupProgressText}" FontSize="14"
+                    <TextBlock Text="{Binding GroupProgressText}" FontSize="15"
                                Foreground="#666" VerticalAlignment="Center"/>
-                    <TextBlock Text="{Binding LearnedDisplayText}" FontSize="14"
-                               Foreground="#666" Margin="20,0,0,0" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding LearnedDisplayText}" FontSize="15"
+                               Foreground="#666" Margin="24,0,0,0" VerticalAlignment="Center"/>
                 </StackPanel>
                 <ComboBox x:Name="DifficultyCombo"
                           SelectedIndex="{Binding SelectedDifficultyIndex, Mode=TwoWay}"
                           HorizontalAlignment="Right"
-                          Padding="8,6" FontSize="13"
+                          Padding="10,8" FontSize="14"
                           ItemsSource="{Binding DifficultyList}"
                           DisplayMemberPath="Label"/>
             </Grid>
         </Border>
 
         <!-- Row 1: 学习卡片 -->
-        <Grid Grid.Row="1" Margin="20,16,20,8">
+        <Grid Grid.Row="1" Margin="24,20,24,12">
             <!-- 学习中 -->
-            <Border Background="White" CornerRadius="12" Padding="24"
+            <Border Background="White" CornerRadius="12" Padding="40"
                     Visibility="{Binding IsGroupComplete, Converter={StaticResource InvertBool}}">
                 <Border.Effect>
                     <DropShadowEffect BlurRadius="8" ShadowDepth="2" Opacity="0.12"/>
                 </Border.Effect>
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <TextBlock FontSize="48" FontWeight="Bold" Foreground="#333"
+                        <TextBlock FontSize="56" FontWeight="Bold" Foreground="#333"
                                    HorizontalAlignment="Center" Text="{Binding CurrentWord.Text}"/>
                         <Button Command="{Binding SpeakCommand}" Cursor="Hand"
-                                VerticalAlignment="Center" Margin="12,0,0,4" ToolTip="点击发音">
+                                VerticalAlignment="Center" Margin="16,0,0,4" ToolTip="点击发音">
                             <Button.Template>
                                 <ControlTemplate TargetType="Button">
                                     <Grid>
-                                        <Ellipse x:Name="circle" Width="36" Height="36" Fill="#E3F2FD"/>
-                                        <TextBlock Text="&#x1F50A;" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <Ellipse x:Name="circle" Width="44" Height="44" Fill="#E3F2FD"/>
+                                        <TextBlock Text="&#x1F50A;" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </Grid>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsMouseOver" Value="True">
@@ -61,31 +61,31 @@
                             </Button.Template>
                         </Button>
                     </StackPanel>
-                    <TextBlock FontSize="20" Foreground="#888" HorizontalAlignment="Center"
-                               Margin="0,12,0,0" Text="{Binding CurrentWord.Phonetic}"/>
-                    <Border Height="1" Background="#E0E0E0" Margin="0,20,0,20"/>
-                    <TextBlock FontSize="28" FontWeight="Bold" Foreground="#1E88E5"
+                    <TextBlock FontSize="22" Foreground="#888" HorizontalAlignment="Center"
+                               Margin="0,14,0,0" Text="{Binding CurrentWord.Phonetic}"/>
+                    <Border Height="1" Background="#E0E0E0" Margin="0,24,0,24"/>
+                    <TextBlock FontSize="32" FontWeight="Bold" Foreground="#1E88E5"
                                HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"
                                Text="{Binding CurrentWord.Meaning}"/>
-                    <TextBlock FontSize="15" Foreground="#777" HorizontalAlignment="Center"
-                               Margin="0,18,0,0" TextWrapping="Wrap" TextAlignment="Center"
+                    <TextBlock FontSize="17" Foreground="#777" HorizontalAlignment="Center"
+                               Margin="0,20,0,0" TextWrapping="Wrap" TextAlignment="Center"
                                FontStyle="Italic" Text="{Binding CurrentWord.Example}"/>
                 </StackPanel>
             </Border>
 
             <!-- 本组完成 -->
-            <Border Background="White" CornerRadius="12" Padding="24"
+            <Border Background="White" CornerRadius="12" Padding="40"
                     Visibility="{Binding IsGroupComplete, Converter={StaticResource BoolVis}}">
                 <Border.Effect>
                     <DropShadowEffect BlurRadius="8" ShadowDepth="2" Opacity="0.12"/>
                 </Border.Effect>
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="本组学习完成！" FontSize="28" FontWeight="Bold"
+                    <TextBlock Text="本组学习完成！" FontSize="32" FontWeight="Bold"
                                Foreground="#4CAF50" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding ProgressText}" FontSize="15" Foreground="#888"
-                               HorizontalAlignment="Center" Margin="0,10,0,0"/>
-                    <Button Content="继续下一组" Margin="0,24,0,0" Padding="32,12"
-                            FontSize="16" FontWeight="SemiBold" Cursor="Hand"
+                    <TextBlock Text="{Binding ProgressText}" FontSize="17" Foreground="#888"
+                               HorizontalAlignment="Center" Margin="0,12,0,0"/>
+                    <Button Content="继续下一组" Margin="0,28,0,0" Padding="40,14"
+                            FontSize="18" FontWeight="SemiBold" Cursor="Hand"
                             Command="{Binding ContinueToNextGroupCommand}"
                             Background="#4CAF50" Foreground="White"
                             Style="{StaticResource RatingButton}"/>
@@ -94,7 +94,7 @@
         </Grid>
 
         <!-- Row 2: 底部操作 -->
-        <Grid Grid.Row="2" Margin="16,0,16,20">
+        <Grid Grid.Row="2" Margin="24,0,24,24">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
@@ -102,12 +102,12 @@
 
             <!-- 进度指示器 -->
             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                <TextBlock Text="{Binding ProgressText}" FontSize="16" FontWeight="SemiBold"
+                <TextBlock Text="{Binding ProgressText}" FontSize="18" FontWeight="SemiBold"
                            Foreground="#555" VerticalAlignment="Center"/>
             </StackPanel>
 
-            <Button Grid.Column="1" Content="下一个" Padding="20,10"
-                    FontSize="16" FontWeight="SemiBold" Cursor="Hand"
+            <Button Grid.Column="1" Content="下一个" Padding="28,12"
+                    FontSize="18" FontWeight="SemiBold" Cursor="Hand"
                     HorizontalAlignment="Right"
                     Command="{Binding NextWordCommand}"
                     Background="#2196F3" Foreground="White"

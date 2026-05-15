@@ -1,9 +1,10 @@
 <Window x:Class="EnglishLearner.App.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="EnglishLearner" Height="600" Width="500"
+        Title="EnglishLearner" Height="720" Width="960"
         WindowStartupLocation="CenterScreen"
-        ResizeMode="CanMinimize"
+        MinWidth="800" MinHeight="600"
+        ResizeMode="CanResize"
         StateChanged="Window_StateChanged"
         Loaded="Window_Loaded">
     <Grid>
@@ -13,20 +14,41 @@
         </Grid.RowDefinitions>
 
         <!-- 导航栏 -->
-        <Border Grid.Row="0" Background="White" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
+        <Border x:Name="NavBar" Grid.Row="0" Background="White" BorderBrush="#E0E0E0"
+                BorderThickness="0,0,0,1" Visibility="Collapsed">
             <StackPanel Orientation="Horizontal" Margin="12,8">
-                <Button x:Name="NavLearning" Content="学单词" Click="NavLearning_Click"
-                        Padding="16,8" Margin="0,0,4,0" FontSize="14" FontWeight="SemiBold"
-                        Cursor="Hand" Background="#2196F3" Foreground="White"
-                        Style="{StaticResource NavButton}"/>
-                <Button x:Name="NavQuiz" Content="测验" Click="NavQuiz_Click"
-                        Padding="16,8" Margin="4,0,4,0" FontSize="14" FontWeight="SemiBold"
+                <Button x:Name="NavHome" Content="&#x1F3E0; 首页" Click="NavHome_Click"
+                        Padding="12,8" Margin="0,0,8,0" FontSize="14" FontWeight="SemiBold"
                         Cursor="Hand" Background="#E0E0E0" Foreground="#666"
                         Style="{StaticResource NavButton}"/>
-                <Button x:Name="NavMastered" Content="已完成" Click="NavMastered_Click"
-                        Padding="16,8" Margin="4,0,0,0" FontSize="14" FontWeight="SemiBold"
-                        Cursor="Hand" Background="#E0E0E0" Foreground="#666"
-                        Style="{StaticResource NavButton}"/>
+
+                <!-- 单词学习模块导航 -->
+                <StackPanel x:Name="LearningNav" Orientation="Horizontal">
+                    <Button x:Name="NavLearning" Content="学单词" Click="NavLearning_Click"
+                            Padding="16,8" Margin="0,0,4,0" FontSize="14" FontWeight="SemiBold"
+                            Cursor="Hand" Background="#2196F3" Foreground="White"
+                            Style="{StaticResource NavButton}"/>
+                    <Button x:Name="NavQuiz" Content="测验" Click="NavQuiz_Click"
+                            Padding="16,8" Margin="4,0,4,0" FontSize="14" FontWeight="SemiBold"
+                            Cursor="Hand" Background="#E0E0E0" Foreground="#666"
+                            Style="{StaticResource NavButton}"/>
+                    <Button x:Name="NavMastered" Content="已完成" Click="NavMastered_Click"
+                            Padding="16,8" Margin="4,0,0,0" FontSize="14" FontWeight="SemiBold"
+                            Cursor="Hand" Background="#E0E0E0" Foreground="#666"
+                            Style="{StaticResource NavButton}"/>
+                </StackPanel>
+
+                <!-- 听力口语模块导航 -->
+                <StackPanel x:Name="ListeningNav" Orientation="Horizontal" Visibility="Collapsed">
+                    <Button x:Name="NavDictation" Content="&#x1F3A7; 听力练习" Click="NavDictation_Click"
+                            Padding="16,8" Margin="0,0,4,0" FontSize="14" FontWeight="SemiBold"
+                            Cursor="Hand" Background="#E0E0E0" Foreground="#666"
+                            Style="{StaticResource NavButton}"/>
+                    <Button x:Name="NavSpeaking" Content="&#x1F3A4; 口语评分" Click="NavSpeaking_Click"
+                            Padding="16,8" Margin="4,0,0,0" FontSize="14" FontWeight="SemiBold"
+                            Cursor="Hand" Background="#E0E0E0" Foreground="#666"
+                            Style="{StaticResource NavButton}"/>
+                </StackPanel>
             </StackPanel>
         </Border>
 

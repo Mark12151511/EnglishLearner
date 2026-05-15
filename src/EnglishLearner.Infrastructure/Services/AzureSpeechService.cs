@@ -6,6 +6,7 @@ public sealed class AzureSpeechService : ISpeechService
 {
     private bool _disposed;
 
+    public int Rate { get; set; } = -1;
     public Task InitializeAsync() => Task.CompletedTask;
     public void Speak(string text) { }
     public void Preload(string text) { }

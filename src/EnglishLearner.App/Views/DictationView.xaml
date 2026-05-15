@@ -1,0 +1,396 @@
+<UserControl x:Class="EnglishLearner.App.Views.DictationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:EnglishLearner.App.ViewModels">
+    <UserControl.DataContext>
+        <vm:DictationViewModel/>
+    </UserControl.DataContext>
+
+    <Grid Background="#F0F0F0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Row 0: 进度区 -->
+        <Border Grid.Row="0" Background="White" Padding="24,16"
+                BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
+            <Grid>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <TextBlock Text="听力练习" FontSize="18" FontWeight="Bold" Foreground="#333"
+                               VerticalAlignment="Center"/>
+                    <TextBlock FontSize="15" Foreground="#888" VerticalAlignment="Center" Margin="16,0,0,0">
+                        <Run Text="{Binding CurrentIndex, Mode=OneWay}"/>
+                        <Run Text=" / "/>
+                        <Run Text="{Binding TotalCount, Mode=OneWay}"/>
+                    </TextBlock>
+                </StackPanel>
+                <ProgressBar HorizontalAlignment="Right" Width="240" Height="8"
+                             Minimum="0" Maximum="{Binding TotalCount}"
+                             Value="{Binding CurrentIndex}" Foreground="#9C27B0"/>
+            </Grid>
+        </Border>
+
+        <!-- Row 1: 模式切换 -->
+        <Border Grid.Row="1" Background="White" CornerRadius="8" Margin="24,10,24,0"
+                HorizontalAlignment="Left" Padding="4,4">
+            <StackPanel Orientation="Horizontal">
+            <Button Content="&#x1F4DD; 单词听写"
+                    Command="{Binding SwitchModeCommand}" CommandParameter="word"
+                    Margin="0,0,2,0">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="#EEE"/>
+                        <Setter Property="Foreground" Value="#666"/>
+                        <Setter Property="FontSize" Value="14"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="Padding" Value="14,8"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                            CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                          TextElement.Foreground="{TemplateBinding Foreground}"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="bd" Property="Opacity" Value="0.85"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsSentenceMode}" Value="False">
+                                <Setter Property="Background" Value="#5C6BC0"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <Button Content="&#x1F4AC; 句子听写" Padding="14,8" FontSize="14" FontWeight="SemiBold"
+                    Command="{Binding SwitchModeCommand}" CommandParameter="sentence"
+                    Cursor="Hand" BorderThickness="0">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="#EEE"/>
+                        <Setter Property="Foreground" Value="#666"/>
+                        <Setter Property="FontSize" Value="14"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="Padding" Value="14,8"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                            CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                          TextElement.Foreground="{TemplateBinding Foreground}"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="bd" Property="Opacity" Value="0.85"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsSentenceMode}" Value="True">
+                                <Setter Property="Background" Value="#5C6BC0"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </StackPanel>
+        </Border>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="24,8,24,0"
+                    Visibility="{Binding IsSentenceMode, Converter={StaticResource BoolToVisibility}}">
+            <TextBlock Text="难度：" VerticalAlignment="Center" FontSize="14" Foreground="#666"/>
+            <Button Content="&#x1F7E2; 初级" Padding="10,4" Margin="0,0,6,0"
+                    Command="{Binding SetDifficultyCommand}" CommandParameter="1"
+                    Cursor="Hand">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="#E8F5E9"/>
+                        <Setter Property="Foreground" Value="#388E3C"/>
+                        <Setter Property="FontSize" Value="13"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                            CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                          TextElement.Foreground="{TemplateBinding Foreground}"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedDifficulty}" Value="1">
+                                <Setter Property="Background" Value="#4CAF50"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <Button Content="&#x1F7E1; 中级" Padding="10,4" Margin="0,0,6,0"
+                    Command="{Binding SetDifficultyCommand}" CommandParameter="2"
+                    Cursor="Hand">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="#FFF3E0"/>
+                        <Setter Property="Foreground" Value="#E65100"/>
+                        <Setter Property="FontSize" Value="13"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                            CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                          TextElement.Foreground="{TemplateBinding Foreground}"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedDifficulty}" Value="2">
+                                <Setter Property="Background" Value="#FF9800"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <Button Content="&#x1F534; 高级" Padding="10,4"
+                    Command="{Binding SetDifficultyCommand}" CommandParameter="3"
+                    Cursor="Hand">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="#FFEBEE"/>
+                        <Setter Property="Foreground" Value="#C62828"/>
+                        <Setter Property="FontSize" Value="13"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                            CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                          TextElement.Foreground="{TemplateBinding Foreground}"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedDifficulty}" Value="3">
+                                <Setter Property="Background" Value="#F44336"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </StackPanel>
+
+        <!-- Row 3: 听写区 -->
+        <Grid Grid.Row="3" Margin="24,16,24,24">
+            <!-- 有内容时 -->
+            <Border Background="White" CornerRadius="12" Padding="40"
+                    Visibility="{Binding CurrentWord, Converter={StaticResource BoolVis}}">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="8" ShadowDepth="2" Opacity="0.12"/>
+                </Border.Effect>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- 左列：播放 + 输入 -->
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                                Grid.Column="0" Margin="0,0,20,0">
+                        <!-- 播放按钮 -->
+                        <Button Content="&#x1F50A; 播放" Command="{Binding PlayAudioCommand}"
+                                Background="#9C27B0" Foreground="White" FontSize="24" FontWeight="SemiBold"
+                                Padding="48,20" HorizontalAlignment="Center" Cursor="Hand"
+                                Style="{StaticResource RatingButton}" Margin="0,0,0,10"/>
+                        <Button Content="&#x1F4D6; 播放例句" Command="{Binding PlayExampleAudioCommand}"
+                                Background="#FFF3E0" Foreground="#E65100" FontSize="15"
+                                Padding="20,10" HorizontalAlignment="Center" Cursor="Hand"
+                                Style="{StaticResource NavButton}" Margin="0,0,0,36"
+                                Visibility="{Binding IsSentenceMode, Converter={StaticResource InverseBoolToVisibility}}"/>
+
+                        <!-- 提交后：显示单词、音标、释义 -->
+                        <StackPanel HorizontalAlignment="Center" Margin="0,0,0,24"
+                                    Visibility="{Binding IsAnswered, Converter={StaticResource BoolVis}}">
+                            <!-- 句子模式：显示原句 -->
+                            <TextBlock Text="{Binding CurrentSentence.Text}"
+                                       FontSize="18" TextWrapping="Wrap" TextAlignment="Center"
+                                       Foreground="#333" FontWeight="Bold"
+                                       Visibility="{Binding IsSentenceMode, Converter={StaticResource BoolToVisibility}}"
+                                       Margin="0,0,0,8"/>
+                            <!-- 单词模式：显示单词信息 -->
+                            <StackPanel Visibility="{Binding IsSentenceMode, Converter={StaticResource InverseBoolToVisibility}}">
+                                <TextBlock FontSize="42" FontWeight="Bold" Foreground="#333"
+                                           HorizontalAlignment="Center"
+                                           Text="{Binding CurrentWord.Text}"/>
+                                <TextBlock FontSize="20" Foreground="#888" HorizontalAlignment="Center"
+                                           Margin="0,10,0,0" Text="{Binding CurrentWord.Phonetic}"/>
+                                <TextBlock FontSize="22" Foreground="#1E88E5" HorizontalAlignment="Center"
+                                           Margin="0,10,0,0" Text="{Binding CurrentWord.Meaning}"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- 输入框（提交前显示） -->
+                        <Grid Width="400"
+                              Visibility="{Binding IsAnswered, Converter={StaticResource InvertBool}}">
+                            <TextBox x:Name="InputBox"
+                                     Text="{Binding UserInput, UpdateSourceTrigger=PropertyChanged}"
+                                     FontSize="22" FontWeight="SemiBold" TextAlignment="Center"
+                                     Padding="10,12" BorderBrush="#DDD" BorderThickness="1"
+                                     TextChanged="InputBox_TextChanged">
+                                <TextBox.Style>
+                                    <Style TargetType="TextBox">
+                                        <Setter Property="TextWrapping" Value="NoWrap"/>
+                                        <Setter Property="MinHeight" Value="20"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSentenceMode}" Value="True">
+                                                <Setter Property="TextWrapping" Value="Wrap"/>
+                                                <Setter Property="MinHeight" Value="80"/>
+                                                <Setter Property="AcceptsReturn" Value="False"/>
+                                                <Setter Property="FontSize" Value="18"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
+                            <TextBlock x:Name="Placeholder" FontSize="18"
+                                       Foreground="#BBB" TextAlignment="Center" Padding="0,16,0,0"
+                                       IsHitTestVisible="False">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="输入你听到的单词..."/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSentenceMode}" Value="True">
+                                                <Setter Property="Text" Value="完整输入你听到的句子..."/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+
+                        <!-- 提交前按钮 -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0"
+                                    Visibility="{Binding IsAnswered, Converter={StaticResource InvertBool}}">
+                            <Button Content="&#x2705; 提交" Command="{Binding SubmitCommand}"
+                                    Background="#4CAF50" FontSize="16" Padding="28,12"
+                                    Margin="0,0,16,0" Cursor="Hand"
+                                    Style="{StaticResource RatingButton}"/>
+                            <Button Content="&#x1F441; 揭示答案" Command="{Binding RevealCommand}"
+                                    Background="#FF9800" FontSize="16" Padding="28,12"
+                                    Cursor="Hand"
+                                    Style="{StaticResource RatingButton}"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- 右列：评分结果（提交后显示） -->
+                    <Border Grid.Column="1" Width="340" VerticalAlignment="Center"
+                            Visibility="{Binding IsAnswered, Converter={StaticResource BoolVis}}"
+                            Background="#F8F9FA" CornerRadius="12" Padding="24,20">
+                        <StackPanel HorizontalAlignment="Center">
+                            <TextBlock FontSize="40" FontWeight="Bold" Foreground="#4CAF50"
+                                       HorizontalAlignment="Center"
+                                       Text="{Binding Result.Score, StringFormat={}{0:P0}}"/>
+                            <TextBlock FontSize="15" Foreground="#666" HorizontalAlignment="Center"
+                                       Margin="0,8,0,0">
+                                <Run Text="正确 "/><Run Text="{Binding Result.CorrectWords, Mode=OneWay}"/>
+                                <Run Text=" / "/><Run Text="{Binding Result.TotalWords, Mode=OneWay}"/>
+                                <Run Text=" 词"/>
+                            </TextBlock>
+                            <Border Height="1" Background="#E0E0E0" Margin="0,14,0,14"/>
+                            <!-- 逐词对比高亮 -->
+                            <ItemsControl ItemsSource="{Binding Result.WordMatches}"
+                                          HorizontalAlignment="Center" Margin="0,0,0,12">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Margin="3" Padding="6,3" CornerRadius="4"
+                                                BorderThickness="1">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsCorrect}" Value="True">
+                                                            <Setter Property="Background" Value="#E8F5E9"/>
+                                                            <Setter Property="BorderBrush" Value="#4CAF50"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IsCorrect}" Value="False">
+                                                            <Setter Property="Background" Value="#FFEBEE"/>
+                                                            <Setter Property="BorderBrush" Value="#F44336"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <TextBlock Text="{Binding Word}" FontSize="15"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <TextBlock FontSize="15" Foreground="#666" HorizontalAlignment="Center"
+                                       TextWrapping="Wrap">
+                                <Run Text="你的输入："/>
+                                <Run Text="{Binding UserInput, Mode=OneWay}" FontWeight="SemiBold" Foreground="#333"/>
+                            </TextBlock>
+
+                            <!-- 操作按钮 -->
+                            <StackPanel HorizontalAlignment="Center" Margin="0,20,0,0">
+                                <Button Content="&#x27A1; 下一题" Command="{Binding NextCommand}"
+                                        Background="#2196F3" FontSize="16" Padding="32,12"
+                                        HorizontalAlignment="Center" Cursor="Hand"
+                                        Style="{StaticResource RatingButton}" Margin="0,0,0,10"/>
+                                <Button Content="&#x1F504; 再试一次" Command="{Binding RetryCommand}"
+                                        Background="#FF9800" Foreground="White" FontSize="16" FontWeight="SemiBold"
+                                        Padding="24,10" HorizontalAlignment="Center" Cursor="Hand"
+                                        Style="{StaticResource RatingButton}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- 空状态 -->
+            <Border Background="White" CornerRadius="12" Padding="32"
+                    Visibility="{Binding CurrentWord, Converter={StaticResource InvertBool}}">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="8" ShadowDepth="2" Opacity="0.12"/>
+                </Border.Effect>
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <TextBlock Text="练习完成！" FontSize="32" FontWeight="Bold"
+                               Foreground="#9C27B0" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding StatusMessage}" FontSize="16" Foreground="#888"
+                               HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

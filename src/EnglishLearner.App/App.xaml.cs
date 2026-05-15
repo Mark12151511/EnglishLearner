@@ -49,6 +49,9 @@ public partial class App : Application
             var csvPath = Path.Combine(AppContext.BaseDirectory,
                                        "Assets", "WordLists", "words_enriched.csv");
             await seeder.SeedAsync(csvPath);
+
+            var sentenceSeeder = new SentenceSeeder(db);
+            await sentenceSeeder.SeedFromWordExamplesAsync();
         }
 
         // Toast 点击事件
@@ -83,11 +86,20 @@ public partial class App : Application
         services.AddTransient<MainWindow>();
 
         services.AddSingleton(typeof(IRepository<>), typeof(Repository<>));
+        services.AddSingleton<ISentenceRepository, SentenceRepository>();
         services.AddSingleton<ISm2Service, Sm2Service>();
         services.AddSingleton<IAiService, ClaudeAiService>();
         services.AddSingleton<ILearningService, LearningService>();
         services.AddSingleton<IQuizService, QuizService>();
         services.AddSingleton<ISpeechService, SystemSpeechService>();
+
+        // Whisper 语音识别
+        var whisperModelPath = Path.Combine(AppContext.BaseDirectory,
+            "Assets", "WhisperModels", "ggml-base.en.bin");
+        services.AddSingleton<IAudioRecorderService, AudioRecorderService>();
+        services.AddSingleton<ISpeechRecognitionService>(
+            _ => new WhisperRecognitionService(whisperModelPath));
+        services.AddSingleton<IPronunciationScoringService, PronunciationScoringService>();
 
         services.AddSingleton<ToastNotificationService>();
         services.AddSingleton<DailyReviewScheduler>();
@@ -98,17 +110,8 @@ public partial class App : Application
         using var scope = sp.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        var pending = (await db.Database.GetPendingMigrationsAsync()).ToList();
-        if (pending.Count > 0)
-        {
-            await db.Database.MigrateAsync();
-            Log.Information("Database migrated: {Count} migrations applied", pending.Count);
-        }
-        else
-        {
-            await db.Database.EnsureCreatedAsync();
-            Log.Information("Database initialized");
-        }
+        await db.Database.EnsureCreatedAsync();
+        Log.Information("Database initialized");
     }
 
     private void ShowMainWindow()

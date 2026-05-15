@@ -27,6 +27,12 @@ public sealed class SystemSpeechService : ISpeechService
             voice?.VoiceInfo.Name ?? "default");
     }
 
+    public int Rate
+    {
+        get => _synth.Rate;
+        set => _synth.Rate = value;
+    }
+
     public Task InitializeAsync()
     {
         if (_warmedUp) return Task.CompletedTask;

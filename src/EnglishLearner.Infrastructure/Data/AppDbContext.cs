@@ -10,6 +10,7 @@ public class AppDbContext : DbContext
     public DbSet<LearningRecord> LearningRecords => Set<LearningRecord>();
     public DbSet<UserSetting> UserSettings => Set<UserSetting>();
     public DbSet<Sm2Profile> Sm2Profiles => Set<Sm2Profile>();
+    public DbSet<Sentence> Sentences => Set<Sentence>();
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
@@ -20,6 +21,7 @@ public class AppDbContext : DbContext
         ConfigureLearningRecord(modelBuilder);
         ConfigureUserSetting(modelBuilder);
         ConfigureSm2Profile(modelBuilder);
+        ConfigureSentence(modelBuilder);
     }
 
     private static void ConfigureWord(ModelBuilder modelBuilder)
@@ -106,6 +108,19 @@ public class AppDbContext : DbContext
 
             entity.HasIndex(e => e.WordId).IsUnique();
             entity.HasIndex(e => e.NextReviewAt);
+        });
+    }
+
+    private static void ConfigureSentence(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Sentence>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Text).IsRequired().HasMaxLength(500);
+
+            entity.HasIndex(e => e.DifficultyLevel);
+            entity.HasIndex(e => e.Source);
         });
     }
 }
